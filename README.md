@@ -23,7 +23,12 @@
     EMClient.getInstance().init(context,options);
     
     注册
+    
+    EMClient.getInstance().createAccount(name,pwd);
+    
     登录
+    
+    EMClient.getInstance().login(name,pwd);
     
 **EMChatManager**
 
@@ -65,4 +70,26 @@
 
 **EMMessage**
 
-**EMMessageBody**
+	EMMessageBody
+	
+		EMTextMessageBody
+		
+		EMImageMessageBody
+		
+		EMVoiceMessageBody
+		
+		EMVideoMessageBody
+
+**EMConversation**
+
+    String 	conversationId ()
+
+**EMContact**
+
+    String 	getUsername ()
+
+**EMGroup**
+	 
+	String 	getGroupId ()
+	 
+	String 	getGroupName ()
