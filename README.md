@@ -131,7 +131,7 @@
 1. 开屏页面
 2. 注册登录页面
 3. 主页面包含三个子页面(三个 Fragment)
-   1. [会话列表页面](https://github.com/atsiliconvalley/easemobintegration/blob/master/contact_list.png)
+   1. [会话列表页面](https://github.com/atsiliconvalley/easemobintegration/blob/master/conversation_list.png)
    2. [联系人页面](https://github.com/atsiliconvalley/easemobintegration/blob/master/contact_list.png)
    3. 设置页面
 4. [会话页面](https://github.com/atsiliconvalley/easemobintegration/blob/master/conversation.png)
