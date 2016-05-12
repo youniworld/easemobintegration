@@ -14,6 +14,13 @@
 2. 场景式代码练习
 3. 简单聊天应用的实现
 
+### 环境准备
+
+* Android SDK
+* Eclipse
+* [环信SDK3.0版本](http://www.easemob.com/download/im)
+
+
 ### 环信SDK主要类
 
 #### 业务类
