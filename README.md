@@ -128,14 +128,16 @@
 
 每个人按需求实现一个简单的聊天APP
 
-	1. 开屏页面
-	2. 注册登录页面
-	3. 主页面包含三个子页面(三个 Fragment)
-	   1. 会话列表页面
-	   2. 联系人页面
-	   3. 设置页面
-	4. 会话页面
-	5. 收到消息更新会话列表页面
-	6. 点击联系人进入会话页面
+1. 开屏页面
+2. 注册登录页面
+3. 主页面包含三个子页面(三个 Fragment)
+   1. [会话列表页面](https://github.com/atsiliconvalley/easemobintegration/blob/master/contact_list.png)
+   2. [联系人页面](https://github.com/atsiliconvalley/easemobintegration/blob/master/contact_list.png)
+   3. 设置页面
+4. [会话页面](https://github.com/atsiliconvalley/easemobintegration/blob/master/conversation.png)
+5. 收到消息更新会话列表页面
+6. 点击联系人进入会话页面
+7. 可以发送文字，图片，和视频消息
+8. 每个人必须按要求创建一个分支，提交代码到此分支，老师会检查
 	   
 	   
