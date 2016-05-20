@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.example.youni.testapp.MainActivity;
 import com.example.youni.testapp.R;
+import com.example.youni.testapp.model.Model;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMGroup;
@@ -110,6 +111,9 @@ public class LoginActivity extends Activity{
         EMClient.getInstance().login(mEtName.getText().toString(), mEtPwd.getText().toString(), new EMCallBack() {
             @Override
             public void onSuccess() {
+                // 通知model login 成功
+                Model.getInstance().onLoggedIn(EMClient.getInstance().getCurrentUser());
+
                 // 取本地会话
                 EMClient.getInstance().chatManager().loadAllConversations();
 

@@ -7,20 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.youni.testapp.R;
-import com.hyphenate.easeui.ui.EaseChatFragment;
+import com.hyphenate.easeui.ui.EaseConversationListFragment;
 
 /**
  * Created by youni on 2016/5/19.
  */
-public class ConversationListFragment extends Fragment {
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_conversation_list,container,false);
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-    }
+public class ConversationListFragment extends EaseConversationListFragment {
 }

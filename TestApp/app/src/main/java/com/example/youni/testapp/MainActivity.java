@@ -7,16 +7,21 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.widget.RadioGroup;
 
+import com.example.youni.testapp.model.Model;
 import com.example.youni.testapp.ui.fragment.ContactListFragment;
 import com.example.youni.testapp.ui.fragment.ConversationListFragment;
 import com.example.youni.testapp.ui.fragment.SettingsFragment;
+import com.hyphenate.easeui.domain.EaseUser;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends FragmentActivity {
 
     Fragment mSetttingsFragment;
     Fragment mConversationListFragment;
     ContactListFragment mContactListFragment;
-
+    Model.OnSyncListener mContactSyncListener;
     int currentId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,12 +37,12 @@ public class MainActivity extends FragmentActivity {
         group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if(currentId != checkedId){
+                if (currentId != checkedId) {
                     currentId = checkedId;
 
                     Fragment fragment = null;
 
-                    switch (currentId){
+                    switch (currentId) {
                         case R.id.conv_list_btn:
                             fragment = mConversationListFragment;
                             break;
@@ -64,6 +69,10 @@ public class MainActivity extends FragmentActivity {
         currentId = R.id.setting_btn;
 
         switchFragment(mConversationListFragment);
+
+        if(!Model.getInstance().isContactSynced()){
+            Model.getInstance().asyncfetchUsers();
+        }
     }
 
     private void switchFragment(Fragment fragment) {
