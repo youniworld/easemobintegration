@@ -1,8 +1,10 @@
 package com.example.youni.testapp.model;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.example.youni.testapp.model.db.DBManager;
+import com.example.youni.testapp.model.db.PreferenceUtils;
 import com.hyphenate.EMContactListener;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMOptions;
@@ -25,6 +27,7 @@ public class Model {
     private List<OnSyncListener> mContactSyncLiseners;
     private String mCurrentUser;
     private DBManager mDBManager;
+    private PreferenceUtils mPreference;
     private boolean mIsContactSynced = false;
 
     public static class DemoUser{
@@ -79,6 +82,7 @@ public class Model {
                 try {
                     users = EMClient.getInstance().contactManager().getAllContactsFromServer();
                     mIsContactSynced = true;
+                    mPreference.setContactSynced(true);
                 } catch (HyphenateException e) {
                     notifyContactSyncChanged(false);
                     e.printStackTrace();
@@ -104,6 +108,8 @@ public class Model {
 
                 // 最后要更新本地数据库
 
+                mDBManager.saveContacts(mContacts.values());
+
                 notifyContactSyncChanged(true);
             }
         }).start();
@@ -118,7 +124,16 @@ public class Model {
      * 先加载本地的联系人
      */
     public void loadLocalContacts(){
+        Log.d("Model","load local contacts");
+        List<DemoUser> users = mDBManager.getContacts();
 
+        if(users != null){
+            mContacts.clear();;
+
+            for(DemoUser user:users){
+                mContacts.put(user.hxId,user);
+            }
+        }
     }
 
     public void addUser(DemoUser user){
@@ -171,6 +186,8 @@ public class Model {
         }
 
         mContactSyncLiseners = new ArrayList<>();
+        mPreference = new PreferenceUtils(mAppContext);
+        mIsContactSynced = mPreference.isContactSynced();
 
         isInited = true;
 
@@ -214,7 +231,6 @@ public class Model {
         }
 
         mCurrentUser = userName;
-
         mDBManager = new DBManager(mAppContext,mCurrentUser);
     }
 }

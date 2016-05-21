@@ -2,12 +2,14 @@ package com.example.youni.testapp.ui;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.AvoidXfermode;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 
 import com.example.youni.testapp.R;
+import com.example.youni.testapp.model.Model;
 import com.hyphenate.chat.EMClient;
 
 /**
@@ -38,6 +40,8 @@ public class SplashActivity extends Activity {
             new Thread(){
                 @Override
                 public void run(){
+                    Model.getInstance().onLoggedIn(EMClient.getInstance().getCurrentUser());
+
                     // 保证加载本地群，加载所有的群到内存中
                     EMClient.getInstance().groupManager().loadAllGroups();
 

@@ -1,13 +1,16 @@
 package com.example.youni.testapp.model.db;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.example.youni.testapp.model.Model;
+import com.hyphenate.easeui.ui.EaseBaiduMapActivity;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -32,9 +35,59 @@ public class DBManager {
         mHelper = new DBHelper(mContext,mDBName);
     }
 
-    public List<Model.DemoUser> getContacts(){
+    public boolean saveContacts(Collection<Model.DemoUser> contacts){
+        if(contacts== null ||contacts.isEmpty()){
+            return false;
+        }
 
-        return null;
+        checkAvailability();
+
+        SQLiteDatabase db = mHelper.getWritableDatabase();
+        db.beginTransaction();
+
+        for(Model.DemoUser user:contacts){
+            ContentValues values = new ContentValues();
+
+            values.put(UserTable.COL_USERNAME,user.userName);
+            values.put(UserTable.COL_HXID,user.hxId);
+            values.put(UserTable.COL_AVATAR,user.avatarPhoto);
+
+            db.replace(UserTable.TABLE_NAME,null,values);
+        }
+
+        db.setTransactionSuccessful();
+        db.endTransaction();
+
+        return true;
+    }
+
+    public List<Model.DemoUser> getContacts(){
+        checkAvailability();
+
+        List<Model.DemoUser> users = new ArrayList<>();
+
+        SQLiteDatabase db = mHelper.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT * from " + UserTable.TABLE_NAME,null);
+
+        while(cursor.moveToNext()){
+            Model.DemoUser user = new Model.DemoUser();
+            user.userName = cursor.getString(cursor.getColumnIndex(UserTable.COL_USERNAME));
+            user.hxId = cursor.getString(cursor.getColumnIndex(UserTable.COL_HXID));
+            user.avatarPhoto = cursor.getString(cursor.getColumnIndex(UserTable.COL_AVATAR));
+
+            users.add(user);
+        }
+
+        cursor.close();
+
+        return users;
+    }
+
+    private void checkAvailability(){
+        if(mHelper == null){
+            throw new RuntimeException("the helper is null, please init the db mananger");
+        }
     }
 
     class DBHelper extends SQLiteOpenHelper{
@@ -46,33 +99,27 @@ public class DBManager {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-
+            db.execSQL(UserTable.SQL_CREATE_TABLE);
         }
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
         }
-
-        public List<Model.DemoUser> getContacts(){
-            SQLiteDatabase db = getReadableDatabase();
-            Cursor cursor = db.rawQuery("select * from user", null);
-
-            if(!cursor.moveToFirst()){
-                cursor.close();
-                return null;
-            }
-
-            List<Model.DemoUser> users = new ArrayList<>();
-
-            do{
-                Model.DemoUser user = new Model.DemoUser();
-                //
-
-                users.add(user);
-            }while (cursor.moveToNext());
-
-            return users;
-        }
     }
+}
+
+class UserTable{
+    static final String TABLE_NAME = "user";
+
+    static final String COL_USERNAME = "user_name";
+    static final String COL_HXID = "hx_id";
+    static final String COL_AVATAR="user_avatar";
+
+    static final String SQL_CREATE_TABLE = "CREATE TABLE "
+                                            + TABLE_NAME + "("
+                                            + COL_USERNAME + " TEXT, "
+                                            + COL_HXID + " TEXT, "
+                                            + COL_AVATAR + " TEXT PRIMARY KEY);";
+
 }
