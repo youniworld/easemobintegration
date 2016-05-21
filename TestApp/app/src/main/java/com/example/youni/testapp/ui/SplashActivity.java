@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 
-import com.example.youni.testapp.MainActivity;
 import com.example.youni.testapp.R;
 import com.hyphenate.chat.EMClient;
 

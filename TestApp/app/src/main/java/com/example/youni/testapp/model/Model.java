@@ -3,6 +3,7 @@ package com.example.youni.testapp.model;
 import android.content.Context;
 
 import com.example.youni.testapp.model.db.DBManager;
+import com.hyphenate.EMContactListener;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMOptions;
 import com.hyphenate.easeui.controller.EaseUI;
@@ -173,7 +174,38 @@ public class Model {
 
         isInited = true;
 
+        initListener();
+
         return isInited;
+    }
+
+    private void initListener() {
+        EMClient.getInstance().contactManager().setContactListener(new EMContactListener() {
+            @Override
+            public void onContactAdded(String s) {
+
+            }
+
+            @Override
+            public void onContactDeleted(String s) {
+
+            }
+
+            @Override
+            public void onContactInvited(String s, String s1) {
+
+            }
+
+            @Override
+            public void onContactAgreed(String s) {
+
+            }
+
+            @Override
+            public void onContactRefused(String s) {
+
+            }
+        });
     }
 
     public void onLoggedIn(String userName){

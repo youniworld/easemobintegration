@@ -4,13 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <FrameLayout
+    <RelativeLayout
         android:id="@+id/fragment_main"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
         
-    </FrameLayout>
+    </RelativeLayout>
     
     <RadioGroup
         android:id="@+id/tab_group"

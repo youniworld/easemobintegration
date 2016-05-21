@@ -1,4 +1,4 @@
-package com.example.youni.testapp;
+package com.example.youni.testapp.ui;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.widget.RadioGroup;
 
+import com.example.youni.testapp.R;
 import com.example.youni.testapp.model.Model;
 import com.example.youni.testapp.ui.fragment.ContactListFragment;
 import com.example.youni.testapp.ui.fragment.ConversationListFragment;
@@ -64,9 +65,9 @@ public class MainActivity extends FragmentActivity {
             }
         });
 
-        group.check(R.id.setting_btn);
+        group.check(R.id.conv_list_btn);
 
-        currentId = R.id.setting_btn;
+        currentId = R.id.conv_list_btn;
 
         switchFragment(mConversationListFragment);
 
@@ -81,6 +82,7 @@ public class MainActivity extends FragmentActivity {
         FragmentTransaction ft = fm.beginTransaction();
 
         ft.replace(R.id.fragment_main, fragment);
+        ft.show(fragment);
 
         ft.commit();
     }

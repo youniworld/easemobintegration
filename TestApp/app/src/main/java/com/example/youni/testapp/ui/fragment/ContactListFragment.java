@@ -1,9 +1,13 @@
 package com.example.youni.testapp.ui.fragment;
 
+import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 
 import com.example.youni.testapp.R;
 import com.example.youni.testapp.model.Model;
+import com.example.youni.testapp.ui.ChatActivity;
+import com.hyphenate.easeui.EaseConstant;
 import com.hyphenate.easeui.domain.EaseUser;
 import com.hyphenate.easeui.ui.EaseContactListFragment;
 
@@ -67,5 +71,14 @@ public class ContactListFragment extends EaseContactListFragment {
     @Override
     public void initView(){
         super.initView();
+
+        setContactListItemClickListener(new EaseContactListItemClickListener() {
+            @Override
+            public void onListItemClicked(EaseUser user) {
+                Log.d("ContactListFragment", "onListItemClicked");
+
+                getActivity().startActivity(new Intent(getActivity(), ChatActivity.class).putExtra(EaseConstant.EXTRA_USER_ID, user.getUsername()));
+            }
+        });
     }
 }
