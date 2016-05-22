@@ -62,6 +62,7 @@ public class ContactListFragment extends EaseContactListFragment {
         if(appUsers != null){
             for(Model.DemoUser user:appUsers.values()){
                 EaseUser easeUser = new EaseUser(user.hxId);
+                easeUser.setNick(user.userName);
 
                 easeUsers.put(user.hxId,easeUser );
             }

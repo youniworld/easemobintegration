@@ -8,8 +8,10 @@ import com.example.youni.testapp.model.db.PreferenceUtils;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.EMContactListener;
 import com.hyphenate.chat.EMClient;
+import com.hyphenate.chat.EMMessage;
 import com.hyphenate.chat.EMOptions;
 import com.hyphenate.easeui.controller.EaseUI;
+import com.hyphenate.easeui.domain.EaseUser;
 import com.hyphenate.exceptions.HyphenateException;
 
 import java.util.ArrayList;
@@ -95,18 +97,18 @@ public class Model {
             public void onSuccess() {
                 mPreference.setContactSynced(false);
                 mIsContactSynced = false;
-                
+                mContacts.clear();
                 callBack.onSuccess();
             }
 
             @Override
             public void onError(int i, String s) {
-                callBack.onError(i,s);
+                callBack.onError(i, s);
             }
 
             @Override
             public void onProgress(int i, String s) {
-                callBack.onProgress(i,s);
+                callBack.onProgress(i, s);
             }
         });
     }
@@ -194,7 +196,7 @@ public class Model {
             return;
         }
 
-        mContacts.put(user.hxId,user);
+        mContacts.put(user.hxId, user);
     }
 
     public void addOnContactSyncListener(OnSyncListener listener){
@@ -252,6 +254,23 @@ public class Model {
             @Override
             public void onContactRefused(String s) {
 
+            }
+        });
+
+        EaseUI.getInstance().setUserProfileProvider(new EaseUI.EaseUserProfileProvider() {
+            @Override
+            public EaseUser getUser(String username) {
+                DemoUser user = mContacts.get(username);
+
+                if(user != null){
+                    EaseUser easeUser = new EaseUser(username);
+
+                    easeUser.setNick(user.userName);
+
+                    return easeUser;
+                }
+
+                return null;
             }
         });
     }
