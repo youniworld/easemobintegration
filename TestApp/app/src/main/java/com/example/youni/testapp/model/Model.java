@@ -267,6 +267,7 @@ public class Model {
 
                     easeUser.setNick(user.userName);
 
+                    easeUser.setAvatar("http://www.atguigu.com/images/logo.gif");
                     return easeUser;
                 }
 
