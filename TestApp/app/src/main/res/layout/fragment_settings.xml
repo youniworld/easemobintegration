@@ -5,27 +5,34 @@
     android:layout_height="match_parent">
 
     <com.hyphenate.easeui.widget.EaseTitleBar
-        android:id="@+id/easeTitleBar1"
+        android:id="@+id/tb_setttings_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:titleBarTitle="设置"
         />
 
     <ScrollView
+        android:layout_below="@+id/tb_setttings_title"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <Button
-                android:id="@+id/btn_logout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="logout"/>
-        </LinearLayout>
+            android:layout_gravity="center"
+            android:textSize="30sp"
+            android:text="Settings"/>
     </ScrollView>
+
+    <Button
+        android:id="@+id/btn_logout"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/holo_red_light"
+        android:text="退出登录"
+        android:textSize="20sp"
+        android:textColor="@color/btn_white_normal"/>
 
 </LinearLayout>

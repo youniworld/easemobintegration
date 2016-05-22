@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.example.youni.testapp.model.db.DBManager;
 import com.example.youni.testapp.model.db.PreferenceUtils;
+import com.hyphenate.EMCallBack;
 import com.hyphenate.EMContactListener;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMOptions;
@@ -66,6 +67,49 @@ public class Model {
         return me;
     }
 
+    public boolean init(Context appContext){
+        if(isInited){
+            return false;
+        }
+
+        mAppContext = appContext;
+
+        if(!EaseUI.getInstance().init(appContext, new EMOptions())){
+            return false;
+        }
+
+        mContactSyncLiseners = new ArrayList<>();
+        mPreference = new PreferenceUtils(mAppContext);
+        mIsContactSynced = mPreference.isContactSynced();
+
+        isInited = true;
+
+        initListener();
+
+        return isInited;
+    }
+
+    public void logout(final EMCallBack callBack){
+        EMClient.getInstance().logout(false, new EMCallBack() {
+            @Override
+            public void onSuccess() {
+                mPreference.setContactSynced(false);
+                mIsContactSynced = false;
+                
+                callBack.onSuccess();
+            }
+
+            @Override
+            public void onError(int i, String s) {
+                callBack.onError(i,s);
+            }
+
+            @Override
+            public void onProgress(int i, String s) {
+                callBack.onProgress(i,s);
+            }
+        });
+    }
     /**
      * 从远程服务器获取联系人信息
      * 1. 从环信服务器上获取
@@ -116,6 +160,15 @@ public class Model {
     }
 
     private List<DemoUser> fetchUsersFromAppServer() {
+       // 实际上是应该从APP服务器上获取联系人的信息
+
+        // 不过由于缺乏我们的demo的服务器，暂时hick下，用下假数据
+        //
+
+        for(DemoUser user:mContacts.values()){
+            user.userName = user.hxId + "_guigu";
+        }
+
         return null;
     }
 
@@ -172,28 +225,6 @@ public class Model {
 
     public boolean isContactSynced(){
         return mIsContactSynced;
-    }
-
-    public boolean init(Context appContext){
-        if(isInited){
-            return false;
-        }
-
-        mAppContext = appContext;
-
-        if(!EaseUI.getInstance().init(appContext, new EMOptions())){
-            return false;
-        }
-
-        mContactSyncLiseners = new ArrayList<>();
-        mPreference = new PreferenceUtils(mAppContext);
-        mIsContactSynced = mPreference.isContactSynced();
-
-        isInited = true;
-
-        initListener();
-
-        return isInited;
     }
 
     private void initListener() {

@@ -1,6 +1,7 @@
 package com.example.youni.testapp.ui.fragment;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.example.youni.testapp.R;
+import com.example.youni.testapp.model.Model;
+import com.example.youni.testapp.ui.LoginActivity;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
 
@@ -29,18 +32,15 @@ public class SettingsFragment extends Fragment{
 
         Button btnLogout = (Button) getView().findViewById(R.id.btn_logout);
 
+        btnLogout.setText("退出登录(" + EMClient.getInstance().getCurrentUser() + ")");
         btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EMClient.getInstance().logout(false, new EMCallBack() {
+                Model.getInstance().logout(new EMCallBack() {
                     @Override
                     public void onSuccess() {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                getActivity().finish();
-                            }
-                        });
+                        getActivity().startActivity(new Intent(getActivity(), LoginActivity.class));
+                        getActivity().finish();
                     }
 
                     @Override
