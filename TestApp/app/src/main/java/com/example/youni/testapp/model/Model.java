@@ -161,14 +161,18 @@ public class Model {
         }).start();
     }
 
+    private static String[] NICKS = new String[]{"老虎","熊猫","猴子","猎豹","灰熊","企鹅"};
+
     private List<DemoUser> fetchUsersFromAppServer() {
        // 实际上是应该从APP服务器上获取联系人的信息
 
         // 不过由于缺乏我们的demo的服务器，暂时hick下，用下假数据
         //
 
+        int index = 0;
         for(DemoUser user:mContacts.values()){
-            user.userName = user.hxId + "_guigu";
+            user.userName = user.hxId + "_" + NICKS[index%NICKS.length];
+            index++;
         }
 
         return null;
@@ -183,7 +187,7 @@ public class Model {
         List<DemoUser> users = mDBManager.getContacts();
 
         if(users != null){
-            mContacts.clear();;
+            mContacts.clear();
 
             for(DemoUser user:users){
                 mContacts.put(user.hxId,user);
