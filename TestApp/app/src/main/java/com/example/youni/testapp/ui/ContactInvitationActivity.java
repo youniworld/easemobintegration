@@ -68,7 +68,8 @@ public class ContactInvitationActivity extends Activity implements OnContactInvi
                 try {
                     EMClient.getInstance().contactManager().acceptInvitation(hxId);
 
-                    Model.getInstance().removeInvitation(hxId);
+                    //Model.getInstance().removeInvitation(hxId);
+                    Model.getInstance().updateInvitation(InvitationInfo.InvitationStatus.INVITE_ACCEPT,hxId);
 
                     mAdapter.refresh(Model.getInstance().getInvitationInfo());
 
@@ -150,6 +151,8 @@ class MyAdapter extends BaseAdapter{
 
         ViewHolder holder = null;
 
+        InvitationInfo inviteInfo = inviteInfos.get(position);
+
         final DemoUser user  = inviteInfos.get(position).getUser();
 
         if(convertView == null){
@@ -158,6 +161,8 @@ class MyAdapter extends BaseAdapter{
             convertView = View.inflate(context,R.layout.row_contact_invitation,null);
 
             holder.name = (TextView) convertView.findViewById(R.id.tv_user_name);
+            holder.reason = (TextView) convertView.findViewById(R.id.tv_invite_reason);
+
             holder.btnAccept = (Button) convertView.findViewById(R.id.btn_accept);
             holder.btnReject = (Button) convertView.findViewById(R.id.btn_reject);
 
@@ -180,6 +185,21 @@ class MyAdapter extends BaseAdapter{
             holder = (ViewHolder) convertView.getTag();
         }
 
+        if(inviteInfo.getStatus() == InvitationInfo.InvitationStatus.NEW_INVITE){
+            if(inviteInfo.getReason() != null){
+                holder.reason.setText(inviteInfo.getReason());
+            }
+        }else if(inviteInfo.getStatus() == InvitationInfo.InvitationStatus.INVITE_ACCEPT){
+            holder.reason.setText("your added new friend " + user.getUserName());
+
+            holder.btnAccept.setVisibility(View.GONE);
+            holder.btnReject.setVisibility(View.GONE);
+        }else{
+            holder.reason.setText(user.getUserName() + " accepted your invitation");
+            holder.btnAccept.setVisibility(View.GONE);
+            holder.btnReject.setVisibility(View.GONE);
+        }
+
         holder.name.setText(user.getUserName());
 
         return convertView;
@@ -198,6 +218,7 @@ class MyAdapter extends BaseAdapter{
 
     static class ViewHolder{
         TextView name;
+        TextView reason;
         Button btnAccept;
         Button btnReject;
     }

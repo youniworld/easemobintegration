@@ -1,5 +1,6 @@
 package com.example.youni.testapp.model;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
@@ -122,9 +123,9 @@ public class Model {
                 if(users != null){
                     for(String id:users){
                         DemoUser appUser = new DemoUser();
-                        appUser.hxId = id;
-                        appUser.userName = null;
-                        mContacts.put(id,appUser);
+                        appUser.setHxId(id);
+                        appUser.setUserName(null);
+                        mContacts.put(id, appUser);
                     }
                 }
                 // fetch users from app server
@@ -154,7 +155,7 @@ public class Model {
 
         int index = 0;
         for(DemoUser user:mContacts.values()){
-            user.userName = user.hxId + "_" + NICKS[index%NICKS.length];
+            user.setUserName(user.getHxId() + "_" + NICKS[index%NICKS.length]);
             index++;
         }
 
@@ -173,17 +174,17 @@ public class Model {
             mContacts.clear();
 
             for(DemoUser user:users){
-                mContacts.put(user.hxId,user);
+                mContacts.put(user.getHxId(),user);
             }
         }
     }
 
     public void addUser(DemoUser user){
-        if(mContacts.containsKey(user.hxId)){
+        if(mContacts.containsKey(user.getHxId())){
             return;
         }
 
-        mContacts.put(user.hxId, user);
+        mContacts.put(user.getHxId(), user);
 
         // save to db;
         mDBManager.saveContact(user);
@@ -229,13 +230,13 @@ public class Model {
                 if(!mContacts.containsKey(s)){
                     DemoUser user = new DemoUser();
 
-                    user.hxId = s;
+                    user.setHxId(s);
 
                     mContacts.put(s, user);
 
                     // 记住应该还要去自己的APP服务器上去获取联系人信息
 
-                    fetchUserFromAppServer(user.hxId);
+                    fetchUserFromAppServer(user.getHxId());
 
                     mDBManager.saveContact(user);
 
@@ -269,18 +270,26 @@ public class Model {
             }
 
             @Override
-            public void onContactInvited(String s, String s1) {
-                Log.d(TAG,"onContactInvited : " + s);
+            public void onContactInvited(String hxId, String reason) {
+                Log.d(TAG, "onContactInvited : " + hxId);
 
-                mDBManager.addInvitation(s);
+                InvitationInfo inviteInfo = new InvitationInfo();
+                inviteInfo.setUser(new DemoUser(hxId));
+                inviteInfo.setReason(reason);
+                inviteInfo.setStatus(InvitationInfo.InvitationStatus.NEW_INVITE);
+
+                mDBManager.addInvitation(inviteInfo);
+
                 for(EMContactListener listener:mContactListeners){
-                    listener.onContactInvited(s, s1);
+                    listener.onContactInvited(hxId, reason);
                 }
             }
 
             @Override
             public void onContactAgreed(String s) {
                 Log.d(TAG,"onContactInvited : " + s);
+
+                updateInvitation(InvitationInfo.InvitationStatus.INVITE_ACCEPT_BY_PEER,s);
 
                 for(EMContactListener listener:mContactListeners){
                     listener.onContactAgreed(s);
@@ -305,7 +314,7 @@ public class Model {
                 if(user != null){
                     EaseUser easeUser = new EaseUser(username);
 
-                    easeUser.setNick(user.userName);
+                    easeUser.setNick(user.getUserName());
 
                     easeUser.setAvatar("http://www.atguigu.com/images/logo.gif");
                     return easeUser;
@@ -352,5 +361,9 @@ public class Model {
 
     public void removeInvitation(String user) {
         mDBManager.removeInvitation(user);
+    }
+
+    public void updateInvitation(InvitationInfo.InvitationStatus status,String hxId){
+        mDBManager.updateInvitationStatus(status,hxId);
     }
 }

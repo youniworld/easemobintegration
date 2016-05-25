@@ -75,10 +75,10 @@ public class ContactListFragment extends EaseContactListFragment {
 
         if(appUsers != null){
             for(DemoUser user:appUsers.values()){
-                EaseUser easeUser = new EaseUser(user.hxId);
-                easeUser.setNick(user.userName);
+                EaseUser easeUser = new EaseUser(user.getHxId());
+                easeUser.setNick(user.getUserName());
 
-                easeUsers.put(user.hxId,easeUser );
+                easeUsers.put(user.getHxId(),easeUser );
             }
             setContactsMap(easeUsers);
             refresh();

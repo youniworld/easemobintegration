@@ -8,27 +8,34 @@ public class DemoUser {
 
      * nick 名称
      */
-    public String userName;
+    private String userName;
 
     /**
      * 对应的环信ID
      */
-    public String hxId;
+    private String hxId;
 
     /**
      * 个人头像
      */
-    public String avatarPhoto;
+    private String avatarPhoto;
 
     /**
      * 其他个人信息
      */
-    public int age;
+    private int age;
 
     /**
      * education
      */
-    public String education;
+    private String education;
+
+    public DemoUser(String hxId){
+        this.hxId = hxId;
+    }
+
+    public DemoUser(){
+    }
 
     public String getUserName() {
         if(userName == null){

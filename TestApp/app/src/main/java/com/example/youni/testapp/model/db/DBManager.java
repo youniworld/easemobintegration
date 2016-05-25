@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.example.youni.testapp.model.DemoUser;
 import com.example.youni.testapp.model.InvitationInfo;
+import com.example.youni.testapp.model.InvitationInfo.InvitationStatus;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,9 +49,9 @@ public class DBManager {
         for(DemoUser user:contacts){
             ContentValues values = new ContentValues();
 
-            values.put(UserTable.COL_USERNAME,user.userName);
-            values.put(UserTable.COL_HXID,user.hxId);
-            values.put(UserTable.COL_AVATAR,user.avatarPhoto);
+            values.put(UserTable.COL_USERNAME,user.getUserName());
+            values.put(UserTable.COL_HXID,user.getHxId());
+            values.put(UserTable.COL_AVATAR,user.getAvatarPhoto());
 
             db.replace(UserTable.TABLE_NAME,null,values);
         }
@@ -72,9 +73,9 @@ public class DBManager {
 
         while(cursor.moveToNext()){
             DemoUser user = new DemoUser();
-            user.userName = cursor.getString(cursor.getColumnIndex(UserTable.COL_USERNAME));
-            user.hxId = cursor.getString(cursor.getColumnIndex(UserTable.COL_HXID));
-            user.avatarPhoto = cursor.getString(cursor.getColumnIndex(UserTable.COL_AVATAR));
+            user.setUserName(cursor.getString(cursor.getColumnIndex(UserTable.COL_USERNAME)));
+            user.setHxId(cursor.getString(cursor.getColumnIndex(UserTable.COL_HXID)));
+            user.setAvatarPhoto(cursor.getString(cursor.getColumnIndex(UserTable.COL_AVATAR)));
 
             users.add(user);
         }
@@ -89,9 +90,9 @@ public class DBManager {
 
         ContentValues values = new ContentValues();
 
-        values.put(UserTable.COL_HXID,user.hxId);
-        values.put(UserTable.COL_USERNAME,user.userName);
-        values.put(UserTable.COL_AVATAR,user.avatarPhoto);
+        values.put(UserTable.COL_HXID,user.getHxId());
+        values.put(UserTable.COL_USERNAME,user.getUserName());
+        values.put(UserTable.COL_AVATAR,user.getAvatarPhoto());
 
         db.replace(UserTable.TABLE_NAME, null, values);
     }
@@ -99,7 +100,7 @@ public class DBManager {
     public void deleteContact(DemoUser user){
         SQLiteDatabase db = mHelper.getWritableDatabase();
 
-        db.delete(UserTable.TABLE_NAME, UserTable.COL_HXID + " = ? ", new String[]{user.hxId});
+        db.delete(UserTable.TABLE_NAME, UserTable.COL_HXID + " = ? ", new String[]{user.getHxId()});
     }
 
     public List<InvitationInfo> getContactInvitations(){
@@ -108,35 +109,72 @@ public class DBManager {
 
         SQLiteDatabase db = mHelper.getReadableDatabase();
 
-        Cursor cursor = db.rawQuery("select * from " + InivtationMessageTable.TABLE_NAME,null);
+        Cursor cursor = db.rawQuery("select * from " + InvitationMessageTable.TABLE_NAME,null);
 
         while(cursor.moveToNext()){
             DemoUser user = new DemoUser();
-            user.hxId = cursor.getString(0);
-            user.userName = user.hxId;
+            user.setHxId(cursor.getString(cursor.getColumnIndex(InvitationMessageTable.COL_HXID)));
+            user.setUserName(cursor.getString(cursor.getColumnIndex(InvitationMessageTable.COL_USERNAME)));
 
             InvitationInfo info = new InvitationInfo();
-
             info.setUser(user);
+
+            info.setStatus(intToInviteStatus(cursor.getInt(cursor.getColumnIndex(InvitationMessageTable.COL_INVITE_STATUS))));
+            info.setReason(cursor.getString(cursor.getColumnIndex(InvitationMessageTable.COL_REASON)));
             inviteInfos.add(info);
         }
 
         return inviteInfos;
     }
 
-    public void addInvitation(String hxId){
+    private InvitationStatus intToInviteStatus(int intStatus){
+        if(intStatus == InvitationStatus.NEW_INVITE.ordinal()){
+            return InvitationStatus.NEW_INVITE;
+        }
+
+        if(intStatus == InvitationStatus.INVITE_ACCEPT.ordinal()){
+            return InvitationStatus.INVITE_ACCEPT;
+        }
+
+        return InvitationStatus.INVITE_ACCEPT_BY_PEER;
+    }
+
+    public void addInvitation(InvitationInfo invitationInfo){
         SQLiteDatabase db = mHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(InivtationMessageTable.COL_USER,hxId);
+        values.put(InvitationMessageTable.COL_HXID,invitationInfo.getUser().getHxId());
+        values.put(InvitationMessageTable.COL_INVITE_STATUS,invitationInfo.getStatus().ordinal());
+        values.put(InvitationMessageTable.COL_REASON,invitationInfo.getReason());
+        values.put(InvitationMessageTable.COL_USERNAME,invitationInfo.getUser().getUserName());
 
-        db.replace(InivtationMessageTable.TABLE_NAME,null,values);
+        db.replace(InvitationMessageTable.TABLE_NAME,null,values);
     }
 
     public void removeInvitation(String hxId){
         SQLiteDatabase db = mHelper.getWritableDatabase();
 
-        db.delete(InivtationMessageTable.TABLE_NAME,InivtationMessageTable.COL_USER + " =? ",new String[]{hxId});
+        db.delete(InvitationMessageTable.TABLE_NAME, InvitationMessageTable.COL_HXID + " =? ", new String[]{hxId});
+    }
+
+    public void updateInvitationStatus(InvitationStatus invitationStatus,String hxId){
+        ContentValues values = new ContentValues();
+        values.put(InvitationMessageTable.COL_INVITE_STATUS, invitationStatus.ordinal());
+
+        updateInvitationInfo(values, hxId);
+    }
+
+    public void updateInvitationUserName(String username,String hxId){
+        ContentValues values = new ContentValues();
+        values.put(InvitationMessageTable.COL_USERNAME,username);
+
+        updateInvitationInfo(values,hxId);
+    }
+
+    private void updateInvitationInfo(ContentValues updateValues, String hxId){
+        SQLiteDatabase db = mHelper.getWritableDatabase();
+
+        db.update(InvitationMessageTable.TABLE_NAME,updateValues, InvitationMessageTable.COL_HXID + "=?",new String[]{hxId});
     }
 
     private void checkAvailability(){
@@ -155,7 +193,7 @@ public class DBManager {
         @Override
         public void onCreate(SQLiteDatabase db) {
             db.execSQL(UserTable.SQL_CREATE_TABLE);
-            db.execSQL(InivtationMessageTable.SQL_CREATE_TABLE);
+            db.execSQL(InvitationMessageTable.SQL_CREATE_TABLE);
         }
 
         @Override
@@ -180,10 +218,17 @@ class UserTable{
 
 }
 
-class InivtationMessageTable{
+class InvitationMessageTable {
     static final String TABLE_NAME = "invitation_message";
-    static final String COL_USER = "user";
+    static final String COL_HXID = "_hx_id";
+    static final String COL_USERNAME = "_username";
+    static final String COL_REASON ="_reason";
+    static final String COL_INVITE_STATUS ="_invite_status";
+
     static final String SQL_CREATE_TABLE = "CREATE TABLE "
                                             + TABLE_NAME + " ("
-                                            + COL_USER + " TEXT PRIMARY KEY);";
+                                            + COL_INVITE_STATUS + "I NTEGER , "
+                                            + COL_REASON + " TEXT, "
+                                            + COL_USERNAME + " TEXT, "
+                                            + COL_HXID + " TEXT PRIMARY KEY);";
 }
