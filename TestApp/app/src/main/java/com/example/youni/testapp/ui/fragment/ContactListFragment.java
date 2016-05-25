@@ -2,6 +2,7 @@ package com.example.youni.testapp.ui.fragment;
 
 import android.content.Intent;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 
 import com.example.youni.testapp.R;
@@ -9,6 +10,7 @@ import com.example.youni.testapp.model.DemoUser;
 import com.example.youni.testapp.model.Model;
 import com.example.youni.testapp.ui.AddFriendActivity;
 import com.example.youni.testapp.ui.ChatActivity;
+import com.example.youni.testapp.ui.ContactInvitationActivity;
 import com.hyphenate.easeui.EaseConstant;
 import com.hyphenate.easeui.domain.EaseUser;
 import com.hyphenate.easeui.ui.EaseContactListFragment;
@@ -26,6 +28,16 @@ public class ContactListFragment extends EaseContactListFragment {
     @Override
     public void setUpView(){
         super.setUpView();
+        View headerView = LayoutInflater.from(getContext()).inflate(R.layout.activity_contact_header,null);
+        listView.addHeaderView(headerView);
+
+        headerView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().startActivity(new Intent(getActivity(), ContactInvitationActivity.class));
+            }
+        });
+
         titleBar.setRightImageResource(R.drawable.em_add);
 
         titleBar.setRightLayoutClickListener(new View.OnClickListener() {

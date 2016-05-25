@@ -5,6 +5,7 @@ package com.example.youni.testapp.model;
  */
 public class DemoUser {
     /**
+
      * nick 名称
      */
     public String userName;
@@ -28,4 +29,40 @@ public class DemoUser {
      * education
      */
     public String education;
+
+    public String getUserName() {
+        if(userName == null){
+            return hxId;
+        }
+
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getHxId() {
+        return hxId;
+    }
+
+    public void setHxId(String hxId) {
+        this.hxId = hxId;
+    }
+
+    public String getAvatarPhoto() {
+        return avatarPhoto;
+    }
+
+    public void setAvatarPhoto(String avatarPhoto) {
+        this.avatarPhoto = avatarPhoto;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
 }

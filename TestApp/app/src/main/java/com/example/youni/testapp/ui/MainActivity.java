@@ -32,6 +32,8 @@ public class MainActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        init();
+
         RadioGroup group = (RadioGroup) findViewById(R.id.tab_group);
 
         mSetttingsFragment = new SettingsFragment();
@@ -79,6 +81,10 @@ public class MainActivity extends FragmentActivity {
         }
     }
 
+    private void init(){
+        initListener();
+    }
+
     private void switchFragment(Fragment fragment) {
         FragmentManager fm = getSupportFragmentManager();
 
@@ -94,11 +100,11 @@ public class MainActivity extends FragmentActivity {
         mContactListener = new EMContactListener() {
             @Override
             public void onContactAdded(String s) {
-                DemoUser user = new DemoUser();
-
-                user.hxId = s;
-
-                Model.getInstance().addUser(user);
+//                DemoUser user = new DemoUser();
+//
+//                user.hxId = s;
+//
+//                Model.getInstance().addUser(user);
 
                 MainActivity.this.runOnUiThread(new Runnable() {
                     @Override
@@ -110,16 +116,21 @@ public class MainActivity extends FragmentActivity {
 
             @Override
             public void onContactDeleted(String s) {
-
+                MainActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mContactListFragment.setupContacts();
+                    }
+                });
             }
 
             @Override
             public void onContactInvited(String s, String s1) {
-                try {
-                    EMClient.getInstance().contactManager().acceptInvitation(s);
-                } catch (HyphenateException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    EMClient.getInstance().contactManager().acceptInvitation(s);
+//                } catch (HyphenateException e) {
+//                    e.printStackTrace();
+//                }
             }
 
             @Override
@@ -138,13 +149,15 @@ public class MainActivity extends FragmentActivity {
             }
         };
 
-        EMClient.getInstance().contactManager().setContactListener(mContactListener);
+        Model.getInstance().addContactListeners(mContactListener);
     }
 
     @Override
     protected void onDestroy(){
         super.onDestroy();
 
-        EMClient.getInstance().contactManager().removeContactListener(mContactListener);
+        if(mContactListener != null){
+            Model.getInstance().removeContactListener(mContactListener);
+        }
     }
 }

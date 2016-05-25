@@ -1,7 +1,9 @@
 package com.example.youni.testapp.model;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.youni.testapp.model.db.PreferenceUtils;
 import com.hyphenate.EMCallBack;
@@ -23,6 +25,7 @@ import java.util.Map;
  * Created by youni on 2016/5/19.
  */
 public class Model {
+    private final static String TAG = "Demo Model";
     private boolean isInited = false;
     private Context mAppContext;
     private static Model me = new Model();
@@ -32,6 +35,10 @@ public class Model {
     private DBManager mDBManager;
     private PreferenceUtils mPreference;
     private boolean mIsContactSynced = false;
+    private List<EMContactListener> mContactListeners;
+
+    // used to show the toast
+    private Handler mH = new Handler();
 
     public static interface OnSyncListener{
         public void onSuccess();
@@ -49,7 +56,10 @@ public class Model {
 
         mAppContext = appContext;
 
-        if(!EaseUI.getInstance().init(appContext, new EMOptions())){
+        EMOptions options = new EMOptions();
+        options.setAcceptInvitationAlways(false);
+
+        if(!EaseUI.getInstance().init(appContext, options)){
             return false;
         }
 
@@ -156,7 +166,7 @@ public class Model {
      * 先加载本地的联系人
      */
     public void loadLocalContacts(){
-        Log.d("Model","load local contacts");
+        Log.d("Model", "load local contacts");
         List<DemoUser> users = mDBManager.getContacts();
 
         if(users != null){
@@ -210,30 +220,80 @@ public class Model {
     }
 
     private void initListener() {
+        mContactListeners = new ArrayList<>();
+
         EMClient.getInstance().contactManager().setContactListener(new EMContactListener() {
             @Override
             public void onContactAdded(String s) {
+                Log.d(TAG,"onContactAdded : " + s);
+                if(!mContacts.containsKey(s)){
+                    DemoUser user = new DemoUser();
 
+                    user.hxId = s;
+
+                    mContacts.put(s, user);
+
+                    // 记住应该还要去自己的APP服务器上去获取联系人信息
+
+                    fetchUserFromAppServer(user.hxId);
+
+                    mDBManager.saveContact(user);
+
+                    for(EMContactListener listener:mContactListeners){
+                        listener.onContactAdded(s);
+                    }
+                }
             }
 
             @Override
             public void onContactDeleted(String s) {
+                Log.d(TAG,"onContactDeleted : " + s);
 
+                final DemoUser user = mContacts.get(s);
+
+                if(user != null){
+                    mContacts.remove(s);
+                    mDBManager.deleteContact(user);
+                }
+
+                mH.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(mAppContext,"the user is removed : " + user.getUserName(),Toast.LENGTH_LONG).show();
+                    }
+                });
+
+                for(EMContactListener listener:mContactListeners){
+                    listener.onContactDeleted(s);
+                }
             }
 
             @Override
             public void onContactInvited(String s, String s1) {
+                Log.d(TAG,"onContactInvited : " + s);
 
+                mDBManager.addInvitation(s);
+                for(EMContactListener listener:mContactListeners){
+                    listener.onContactInvited(s, s1);
+                }
             }
 
             @Override
             public void onContactAgreed(String s) {
+                Log.d(TAG,"onContactInvited : " + s);
 
+                for(EMContactListener listener:mContactListeners){
+                    listener.onContactAgreed(s);
+                }
             }
 
             @Override
             public void onContactRefused(String s) {
+                Log.d(TAG,"onContactRefused : " + s);
 
+                for(EMContactListener listener:mContactListeners){
+                    listener.onContactRefused(s);
+                }
             }
         });
 
@@ -256,6 +316,27 @@ public class Model {
         });
     }
 
+    public void addContactListeners(EMContactListener listener){
+        if(mContactListeners.contains(listener)){
+            return;
+        }
+
+        mContactListeners.add(listener);
+    }
+
+    public void removeContactListener(EMContactListener listener){
+        mContactListeners.remove(listener);
+    }
+
+    /**
+     * try to fetch the user info from app server
+     * and when fecting is done, update the cache and the db
+     * @param hxId
+     */
+    private void fetchUserFromAppServer(String hxId) {
+
+    }
+
     public void onLoggedIn(String userName){
         if(mCurrentUser == userName){
             return;
@@ -263,5 +344,13 @@ public class Model {
 
         mCurrentUser = userName;
         mDBManager = new DBManager(mAppContext,mCurrentUser);
+    }
+
+    public List<InvitationInfo> getInvitationInfo(){
+        return mDBManager.getContactInvitations();
+    }
+
+    public void removeInvitation(String user) {
+        mDBManager.removeInvitation(user);
     }
 }

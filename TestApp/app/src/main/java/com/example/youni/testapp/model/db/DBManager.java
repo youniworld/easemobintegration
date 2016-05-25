@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.example.youni.testapp.model.DemoUser;
+import com.example.youni.testapp.model.InvitationInfo;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -98,7 +99,44 @@ public class DBManager {
     public void deleteContact(DemoUser user){
         SQLiteDatabase db = mHelper.getWritableDatabase();
 
-        db.delete(UserTable.TABLE_NAME, UserTable.COL_HXID + " = ? ",new String[]{user.hxId});
+        db.delete(UserTable.TABLE_NAME, UserTable.COL_HXID + " = ? ", new String[]{user.hxId});
+    }
+
+    public List<InvitationInfo> getContactInvitations(){
+
+        List<InvitationInfo> inviteInfos = new ArrayList<>();
+
+        SQLiteDatabase db = mHelper.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("select * from " + InivtationMessageTable.TABLE_NAME,null);
+
+        while(cursor.moveToNext()){
+            DemoUser user = new DemoUser();
+            user.hxId = cursor.getString(0);
+            user.userName = user.hxId;
+
+            InvitationInfo info = new InvitationInfo();
+
+            info.setUser(user);
+            inviteInfos.add(info);
+        }
+
+        return inviteInfos;
+    }
+
+    public void addInvitation(String hxId){
+        SQLiteDatabase db = mHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(InivtationMessageTable.COL_USER,hxId);
+
+        db.replace(InivtationMessageTable.TABLE_NAME,null,values);
+    }
+
+    public void removeInvitation(String hxId){
+        SQLiteDatabase db = mHelper.getWritableDatabase();
+
+        db.delete(InivtationMessageTable.TABLE_NAME,InivtationMessageTable.COL_USER + " =? ",new String[]{hxId});
     }
 
     private void checkAvailability(){
@@ -117,6 +155,7 @@ public class DBManager {
         @Override
         public void onCreate(SQLiteDatabase db) {
             db.execSQL(UserTable.SQL_CREATE_TABLE);
+            db.execSQL(InivtationMessageTable.SQL_CREATE_TABLE);
         }
 
         @Override
@@ -139,4 +178,12 @@ class UserTable{
                                             + COL_HXID + " TEXT, "
                                             + COL_AVATAR + " TEXT PRIMARY KEY);";
 
+}
+
+class InivtationMessageTable{
+    static final String TABLE_NAME = "invitation_message";
+    static final String COL_USER = "user";
+    static final String SQL_CREATE_TABLE = "CREATE TABLE "
+                                            + TABLE_NAME + " ("
+                                            + COL_USER + " TEXT PRIMARY KEY);";
 }
