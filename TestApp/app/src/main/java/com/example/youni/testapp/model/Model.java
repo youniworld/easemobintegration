@@ -3,16 +3,16 @@ package com.example.youni.testapp.model;
 import android.content.Context;
 import android.util.Log;
 
-import com.example.youni.testapp.model.db.DBManager;
 import com.example.youni.testapp.model.db.PreferenceUtils;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.EMContactListener;
 import com.hyphenate.chat.EMClient;
-import com.hyphenate.chat.EMMessage;
 import com.hyphenate.chat.EMOptions;
 import com.hyphenate.easeui.controller.EaseUI;
 import com.hyphenate.easeui.domain.EaseUser;
 import com.hyphenate.exceptions.HyphenateException;
+import com.example.youni.testapp.model.db.DBManager;
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,33 +32,6 @@ public class Model {
     private DBManager mDBManager;
     private PreferenceUtils mPreference;
     private boolean mIsContactSynced = false;
-
-    public static class DemoUser{
-        /**
-         * nick 名称
-         */
-        public String userName;
-
-        /**
-         * 对应的环信ID
-         */
-        public String hxId;
-
-        /**
-         * 个人头像
-         */
-        public String avatarPhoto;
-
-        /**
-         * 其他个人信息
-         */
-        public int age;
-
-        /**
-         * education
-         */
-        public String education;
-    }
 
     public static interface OnSyncListener{
         public void onSuccess();
@@ -201,6 +174,9 @@ public class Model {
         }
 
         mContacts.put(user.hxId, user);
+
+        // save to db;
+        mDBManager.saveContact(user);
     }
 
     public void addOnContactSyncListener(OnSyncListener listener){

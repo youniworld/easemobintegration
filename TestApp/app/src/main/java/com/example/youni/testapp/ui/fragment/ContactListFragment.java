@@ -5,7 +5,9 @@ import android.util.Log;
 import android.view.View;
 
 import com.example.youni.testapp.R;
+import com.example.youni.testapp.model.DemoUser;
 import com.example.youni.testapp.model.Model;
+import com.example.youni.testapp.ui.AddFriendActivity;
 import com.example.youni.testapp.ui.ChatActivity;
 import com.hyphenate.easeui.EaseConstant;
 import com.hyphenate.easeui.domain.EaseUser;
@@ -29,7 +31,7 @@ public class ContactListFragment extends EaseContactListFragment {
         titleBar.setRightLayoutClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                getActivity().startActivity(new Intent(getActivity(), AddFriendActivity.class));
             }
         });
 
@@ -54,13 +56,13 @@ public class ContactListFragment extends EaseContactListFragment {
         }
     }
 
-    private void setupContacts(){
+    public void setupContacts(){
         Map<String,EaseUser> easeUsers = new HashMap<>();
 
-        Map<String,Model.DemoUser> appUsers = Model.getInstance().getContacts();
+        Map<String,DemoUser> appUsers = Model.getInstance().getContacts();
 
         if(appUsers != null){
-            for(Model.DemoUser user:appUsers.values()){
+            for(DemoUser user:appUsers.values()){
                 EaseUser easeUser = new EaseUser(user.hxId);
                 easeUser.setNick(user.userName);
 

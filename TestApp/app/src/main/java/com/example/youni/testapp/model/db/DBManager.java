@@ -6,8 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.example.youni.testapp.model.Model;
-import com.hyphenate.easeui.ui.EaseBaiduMapActivity;
+import com.example.youni.testapp.model.DemoUser;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,7 +34,7 @@ public class DBManager {
         mHelper = new DBHelper(mContext,mDBName);
     }
 
-    public boolean saveContacts(Collection<Model.DemoUser> contacts){
+    public boolean saveContacts(Collection<DemoUser> contacts){
         if(contacts== null ||contacts.isEmpty()){
             return false;
         }
@@ -45,7 +44,7 @@ public class DBManager {
         SQLiteDatabase db = mHelper.getWritableDatabase();
         db.beginTransaction();
 
-        for(Model.DemoUser user:contacts){
+        for(DemoUser user:contacts){
             ContentValues values = new ContentValues();
 
             values.put(UserTable.COL_USERNAME,user.userName);
@@ -61,17 +60,17 @@ public class DBManager {
         return true;
     }
 
-    public List<Model.DemoUser> getContacts(){
+    public List<DemoUser> getContacts(){
         checkAvailability();
 
-        List<Model.DemoUser> users = new ArrayList<>();
+        List<DemoUser> users = new ArrayList<>();
 
         SQLiteDatabase db = mHelper.getReadableDatabase();
 
         Cursor cursor = db.rawQuery("SELECT * from " + UserTable.TABLE_NAME,null);
 
         while(cursor.moveToNext()){
-            Model.DemoUser user = new Model.DemoUser();
+            DemoUser user = new DemoUser();
             user.userName = cursor.getString(cursor.getColumnIndex(UserTable.COL_USERNAME));
             user.hxId = cursor.getString(cursor.getColumnIndex(UserTable.COL_HXID));
             user.avatarPhoto = cursor.getString(cursor.getColumnIndex(UserTable.COL_AVATAR));
@@ -82,6 +81,24 @@ public class DBManager {
         cursor.close();
 
         return users;
+    }
+
+    public void saveContact(DemoUser user){
+        SQLiteDatabase db = mHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+
+        values.put(UserTable.COL_HXID,user.hxId);
+        values.put(UserTable.COL_USERNAME,user.userName);
+        values.put(UserTable.COL_AVATAR,user.avatarPhoto);
+
+        db.replace(UserTable.TABLE_NAME, null, values);
+    }
+
+    public void deleteContact(DemoUser user){
+        SQLiteDatabase db = mHelper.getWritableDatabase();
+
+        db.delete(UserTable.TABLE_NAME, UserTable.COL_HXID + " = ? ",new String[]{user.hxId});
     }
 
     private void checkAvailability(){
