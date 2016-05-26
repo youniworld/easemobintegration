@@ -16,6 +16,7 @@ import com.example.youni.testapp.R;
 import com.example.youni.testapp.model.DemoUser;
 import com.example.youni.testapp.model.InvitationInfo;
 import com.example.youni.testapp.model.Model;
+import com.hyphenate.EMContactListener;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.exceptions.HyphenateException;
 
@@ -48,7 +49,17 @@ public class ContactInvitationActivity extends Activity implements OnContactInvi
         ListView lv = (ListView) findViewById(R.id.lv_invitation_list);
 
         lv.setAdapter(mAdapter);
+
+        Model.getInstance().addContactListeners(contactListener);
+
         setupInvitations();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        Model.getInstance().removeContactListener(contactListener);
     }
 
     void setupInvitations(){
@@ -108,6 +119,36 @@ public class ContactInvitationActivity extends Activity implements OnContactInvi
             }
         }).start();
     }
+
+    class MyContactListener implements EMContactListener{
+
+        @Override
+        public void onContactAdded(String s) {
+
+        }
+
+        @Override
+        public void onContactDeleted(String s) {
+
+        }
+
+        @Override
+        public void onContactInvited(String s, String s1) {
+
+        }
+
+        @Override
+        public void onContactAgreed(String s) {
+            mAdapter.refresh(Model.getInstance().getInvitationInfo());
+        }
+
+        @Override
+        public void onContactRefused(String s) {
+
+        }
+    }
+
+    EMContactListener contactListener = new MyContactListener();
 }
 
 interface OnContactInvitationListener{

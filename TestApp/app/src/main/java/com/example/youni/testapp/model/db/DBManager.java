@@ -227,7 +227,7 @@ class InvitationMessageTable {
 
     static final String SQL_CREATE_TABLE = "CREATE TABLE "
                                             + TABLE_NAME + " ("
-                                            + COL_INVITE_STATUS + "I NTEGER , "
+                                            + COL_INVITE_STATUS + " INTEGER , "
                                             + COL_REASON + " TEXT, "
                                             + COL_USERNAME + " TEXT, "
                                             + COL_HXID + " TEXT PRIMARY KEY);";

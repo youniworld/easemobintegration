@@ -287,9 +287,18 @@ public class Model {
 
             @Override
             public void onContactAgreed(String s) {
-                Log.d(TAG,"onContactInvited : " + s);
+                Log.d(TAG, "onContactInvited : " + s);
 
-                updateInvitation(InvitationInfo.InvitationStatus.INVITE_ACCEPT_BY_PEER,s);
+                InvitationInfo inviteInfo = new InvitationInfo();
+                inviteInfo.setReason("你的邀请已经被接受");
+                inviteInfo.setStatus(InvitationInfo.InvitationStatus.INVITE_ACCEPT_BY_PEER);
+
+                DemoUser user = new DemoUser(s);
+                user.setUserName(s);
+
+                inviteInfo.setUser(user);
+
+                mDBManager.addInvitation(inviteInfo);
 
                 for(EMContactListener listener:mContactListeners){
                     listener.onContactAgreed(s);
