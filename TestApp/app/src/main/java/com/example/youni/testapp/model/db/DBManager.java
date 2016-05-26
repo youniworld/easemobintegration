@@ -51,6 +51,7 @@ public class DBManager {
 
             values.put(UserTable.COL_USERNAME,user.getUserName());
             values.put(UserTable.COL_HXID,user.getHxId());
+            values.put(UserTable.COL_MYCONTACT,1);
             values.put(UserTable.COL_AVATAR,user.getAvatarPhoto());
 
             db.replace(UserTable.TABLE_NAME,null,values);
@@ -69,7 +70,7 @@ public class DBManager {
 
         SQLiteDatabase db = mHelper.getReadableDatabase();
 
-        Cursor cursor = db.rawQuery("SELECT * from " + UserTable.TABLE_NAME,null);
+        Cursor cursor = db.rawQuery("SELECT * from " + UserTable.TABLE_NAME + " where " + UserTable.COL_MYCONTACT  + " = 1",null);
 
         while(cursor.moveToNext()){
             DemoUser user = new DemoUser();
@@ -93,6 +94,7 @@ public class DBManager {
         values.put(UserTable.COL_HXID,user.getHxId());
         values.put(UserTable.COL_USERNAME,user.getUserName());
         values.put(UserTable.COL_AVATAR,user.getAvatarPhoto());
+        values.put(UserTable.COL_MYCONTACT,1);
 
         db.replace(UserTable.TABLE_NAME, null, values);
     }
@@ -119,7 +121,7 @@ public class DBManager {
             InvitationInfo info = new InvitationInfo();
             info.setUser(user);
 
-            info.setStatus(intToInviteStatus(cursor.getInt(cursor.getColumnIndex(InvitationMessageTable.COL_INVITE_STATUS))));
+            info.setStatus(int2InviteStatus(cursor.getInt(cursor.getColumnIndex(InvitationMessageTable.COL_INVITE_STATUS))));
             info.setReason(cursor.getString(cursor.getColumnIndex(InvitationMessageTable.COL_REASON)));
             inviteInfos.add(info);
         }
@@ -127,7 +129,7 @@ public class DBManager {
         return inviteInfos;
     }
 
-    private InvitationStatus intToInviteStatus(int intStatus){
+    private InvitationStatus int2InviteStatus(int intStatus){
         if(intStatus == InvitationStatus.NEW_INVITE.ordinal()){
             return InvitationStatus.NEW_INVITE;
         }
@@ -206,15 +208,21 @@ public class DBManager {
 class UserTable{
     static final String TABLE_NAME = "user";
 
-    static final String COL_USERNAME = "user_name";
-    static final String COL_HXID = "hx_id";
-    static final String COL_AVATAR="user_avatar";
+    static final String COL_USERNAME = "_user_name";
+    static final String COL_HXID = "_hx_id";
+    static final String COL_AVATAR = "_user_avatar";
+
+    /**
+     * indicate if this is my friend or the user used for user info caching
+     */
+    static final String COL_MYCONTACT = "_is_my_friend";
 
     static final String SQL_CREATE_TABLE = "CREATE TABLE "
                                             + TABLE_NAME + "("
                                             + COL_USERNAME + " TEXT, "
-                                            + COL_HXID + " TEXT, "
-                                            + COL_AVATAR + " TEXT PRIMARY KEY);";
+                                            + COL_HXID + " TEXT PRIMARY KEY, "
+                                            + COL_MYCONTACT + " INTEGER, "
+                                            + COL_AVATAR + " TEXT);";
 
 }
 
