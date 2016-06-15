@@ -190,6 +190,12 @@ public class Model {
         mDBManager.saveContact(user);
     }
 
+    public void deleteContact(String hxId){
+        mContacts.remove(hxId);
+        mDBManager.deleteContact(new DemoUser(hxId));
+        mDBManager.removeInvitation(hxId);
+    }
+
     public void addOnContactSyncListener(OnSyncListener listener){
         if(listener == null){
             return;
@@ -252,10 +258,11 @@ public class Model {
 
                 final DemoUser user = mContacts.get(s);
 
-                if(user != null){
-                    mContacts.remove(s);
-                    mDBManager.deleteContact(user);
+                if(user == null){
+                    return;
                 }
+
+                deleteContact(s);
 
                 mH.post(new Runnable() {
                     @Override
@@ -272,6 +279,8 @@ public class Model {
             @Override
             public void onContactInvited(String hxId, String reason) {
                 Log.d(TAG, "onContactInvited : " + hxId);
+
+                updateInviteNotif(true);
 
                 InvitationInfo inviteInfo = new InvitationInfo();
                 inviteInfo.setUser(new DemoUser(hxId));
@@ -374,5 +383,13 @@ public class Model {
 
     public void updateInvitation(InvitationInfo.InvitationStatus status,String hxId){
         mDBManager.updateInvitationStatus(status,hxId);
+    }
+
+    public void updateInviteNotif(boolean hasNotify){
+        mDBManager.updateInvitateNoify(hasNotify);
+    }
+
+    public boolean hasInviteNotif(){
+        return mDBManager.hasInviteNotif();
     }
 }

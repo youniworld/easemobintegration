@@ -10,6 +10,7 @@ import com.example.youni.testapp.model.DemoUser;
 import com.example.youni.testapp.model.InvitationInfo;
 import com.example.youni.testapp.model.InvitationInfo.InvitationStatus;
 
+import java.sql.SQLClientInfoException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -150,7 +151,7 @@ public class DBManager {
         values.put(InvitationMessageTable.COL_REASON,invitationInfo.getReason());
         values.put(InvitationMessageTable.COL_USERNAME,invitationInfo.getUser().getUserName());
 
-        db.replace(InvitationMessageTable.TABLE_NAME,null,values);
+        db.replace(InvitationMessageTable.TABLE_NAME, null, values);
     }
 
     public void removeInvitation(String hxId){
@@ -170,19 +171,48 @@ public class DBManager {
         ContentValues values = new ContentValues();
         values.put(InvitationMessageTable.COL_USERNAME,username);
 
-        updateInvitationInfo(values,hxId);
+        updateInvitationInfo(values, hxId);
     }
 
     private void updateInvitationInfo(ContentValues updateValues, String hxId){
         SQLiteDatabase db = mHelper.getWritableDatabase();
 
-        db.update(InvitationMessageTable.TABLE_NAME,updateValues, InvitationMessageTable.COL_HXID + "=?",new String[]{hxId});
+        db.update(InvitationMessageTable.TABLE_NAME, updateValues, InvitationMessageTable.COL_HXID + "=?", new String[]{hxId});
     }
 
     private void checkAvailability(){
         if(mHelper == null){
             throw new RuntimeException("the helper is null, please init the db mananger");
         }
+    }
+
+    public void updateInvitateNoify(boolean hasNotif){
+        checkAvailability();
+
+        SQLiteDatabase db = mHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(NotificationTable.COL_NOTIF_NAME,NotificationTable.INVITE_NOTIF_NAME);
+        values.put(NotificationTable.COL_MARKED,hasNotif?1:0);
+        db.update(NotificationTable.TABLE_NAME,values,null,null);
+        //db.replace(NotificationTable.TABLE_NAME, null, values);
+    }
+
+    public boolean hasInviteNotif(){
+        checkAvailability();
+
+        SQLiteDatabase db = mHelper.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + NotificationTable.TABLE_NAME + " WHERE " + NotificationTable.COL_NOTIF_NAME + "=?", new String[]{NotificationTable.INVITE_NOTIF_NAME});
+
+        while (cursor.moveToNext()){
+            int notif = cursor.getInt(cursor.getColumnIndex(NotificationTable.COL_MARKED));
+
+            if(notif > 0){
+                return true;
+            }
+        }
+
+        return false;
     }
 
     class DBHelper extends SQLiteOpenHelper{
@@ -196,6 +226,7 @@ public class DBManager {
         public void onCreate(SQLiteDatabase db) {
             db.execSQL(UserTable.SQL_CREATE_TABLE);
             db.execSQL(InvitationMessageTable.SQL_CREATE_TABLE);
+            NotificationTable.onCreate(db);
         }
 
         @Override
@@ -239,4 +270,29 @@ class InvitationMessageTable {
                                             + COL_REASON + " TEXT, "
                                             + COL_USERNAME + " TEXT, "
                                             + COL_HXID + " TEXT PRIMARY KEY);";
+}
+
+class NotificationTable{
+    static final String TABLE_NAME = "_notif";
+    static final String COL_NOTIF_NAME = "_notif_name";
+    static final String COL_MARKED = "_marked";
+    static final String SQL_CREATE_TABLE = "CREATE TABLE "
+                                            + TABLE_NAME + "("
+                                            + COL_NOTIF_NAME + " TEXT PRIMARY KEY, "
+                                            + COL_MARKED + " INTEGER);";
+
+    static final String INVITE_NOTIF_NAME = "invite_notif";
+
+    static void onCreate(SQLiteDatabase db){
+        // 创建notification表
+        db.execSQL(SQL_CREATE_TABLE);
+
+        // 插入固定的行
+        ContentValues values = new ContentValues();
+
+        values.put(COL_NOTIF_NAME,INVITE_NOTIF_NAME);
+        values.put(COL_MARKED,0);
+
+        db.insert(TABLE_NAME,null,values);
+    }
 }

@@ -15,13 +15,18 @@ import com.example.youni.testapp.ui.fragment.ContactListFragment;
 import com.example.youni.testapp.ui.fragment.ConversationListFragment;
 import com.example.youni.testapp.ui.fragment.SettingsFragment;
 import com.hyphenate.EMContactListener;
+import com.hyphenate.EMMessageListener;
 import com.hyphenate.chat.EMClient;
+import com.hyphenate.chat.EMMessage;
+import com.hyphenate.easeui.controller.EaseUI;
 import com.hyphenate.exceptions.HyphenateException;
+
+import java.util.List;
 
 public class MainActivity extends FragmentActivity {
 
     Fragment mSetttingsFragment;
-    Fragment mConversationListFragment;
+    ConversationListFragment mConversationListFragment;
     ContactListFragment mContactListFragment;
     Model.OnSyncListener mContactSyncListener;
     int currentId;
@@ -153,11 +158,46 @@ public class MainActivity extends FragmentActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        EMClient.getInstance().chatManager().addMessageListener(messageListener);
+    }
+
+    @Override
     protected void onDestroy(){
         super.onDestroy();
 
+        EMClient.getInstance().chatManager().removeMessageListener(messageListener);
         if(mContactListener != null){
             Model.getInstance().removeContactListener(mContactListener);
         }
     }
+
+    private EMMessageListener messageListener = new EMMessageListener() {
+        @Override
+        public void onMessageReceived(List<EMMessage> list) {
+            EaseUI.getInstance().getNotifier().onNewMesg(list);
+            mConversationListFragment.refresh();
+        }
+
+        @Override
+        public void onCmdMessageReceived(List<EMMessage> list) {
+
+        }
+
+        @Override
+        public void onMessageReadAckReceived(List<EMMessage> list) {
+
+        }
+
+        @Override
+        public void onMessageDeliveryAckReceived(List<EMMessage> list) {
+
+        }
+
+        @Override
+        public void onMessageChanged(EMMessage emMessage, Object o) {
+
+        }
+    };
 }
