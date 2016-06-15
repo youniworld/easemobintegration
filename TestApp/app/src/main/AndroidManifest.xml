@@ -40,23 +40,24 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.LoginActivity">
+        <activity android:name=".ui.LoginActivity"
+            android:launchMode="singleTask"
+            >
 
         </activity>
         <activity android:name=".ui.MainActivity"
+            android:launchMode="singleTask"
             android:windowSoftInputMode="adjustPan">
         </activity>
 
-        <activity android:name=".ui.ChatActivity">
+        <activity android:name=".ui.ChatActivity"/>
 
-        </activity>
+        <activity android:name=".ui.AddFriendActivity"/>
 
-        <activity android:name=".ui.AddFriendActivity">
-        </activity>
+        <activity android:name=".ui.ContactInvitationActivity"/>
 
-        <activity android:name=".ui.ContactInvitationActivity">
+        <activity android:name="com.hyphenate.easeui.ui.EaseShowBigImageActivity"/>
 
-        </activity>
         <!-- 设置环信应用的appkey -->
         <meta-data
             android:name="EASEMOB_APPKEY"

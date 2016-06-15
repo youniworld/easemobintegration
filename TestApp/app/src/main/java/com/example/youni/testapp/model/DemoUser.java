@@ -64,12 +64,4 @@ public class DemoUser {
     public void setAvatarPhoto(String avatarPhoto) {
         this.avatarPhoto = avatarPhoto;
     }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
 }

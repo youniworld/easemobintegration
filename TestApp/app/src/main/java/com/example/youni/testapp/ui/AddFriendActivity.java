@@ -49,7 +49,9 @@ public class AddFriendActivity extends Activity{
                     @Override
                     public void run() {
                         try {
-                            EMClient.getInstance().contactManager().addContact(name,"add a new friend");
+                            String hxId = EMClient.getInstance().getCurrentUser();
+                            String nick = hxId + "_凤凰";
+                            EMClient.getInstance().contactManager().addContact(name,nick);
 
                             AddFriendActivity.this.runOnUiThread(new Runnable() {
                                 @Override

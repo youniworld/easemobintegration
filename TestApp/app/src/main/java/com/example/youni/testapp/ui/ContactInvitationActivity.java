@@ -229,6 +229,8 @@ class MyAdapter extends BaseAdapter{
         if(inviteInfo.getStatus() == InvitationInfo.InvitationStatus.NEW_INVITE){
             if(inviteInfo.getReason() != null){
                 holder.reason.setText(inviteInfo.getReason());
+            }else{
+                holder.reason.setText("加个好友吧!");
             }
         }else if(inviteInfo.getStatus() == InvitationInfo.InvitationStatus.INVITE_ACCEPT){
             holder.reason.setText("your added new friend " + user.getUserName());

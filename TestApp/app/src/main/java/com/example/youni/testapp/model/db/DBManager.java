@@ -10,7 +10,6 @@ import com.example.youni.testapp.model.DemoUser;
 import com.example.youni.testapp.model.InvitationInfo;
 import com.example.youni.testapp.model.InvitationInfo.InvitationStatus;
 
-import java.sql.SQLClientInfoException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -20,10 +19,6 @@ import java.util.List;
  */
 public class DBManager {
     private static final int DB_VERSION = 1;
-    private static DBManager me = null;
-
-    private String mDBName;
-    private Context mContext;
     private DBHelper mHelper;
 
     public DBManager(Context context, String dbName){
@@ -31,10 +26,7 @@ public class DBManager {
     }
 
     private void init(Context context, String dbName){
-        mContext = context;
-        mDBName = dbName;
-
-        mHelper = new DBHelper(mContext,mDBName);
+        mHelper = new DBHelper(context,dbName);
     }
 
     public boolean saveContacts(Collection<DemoUser> contacts){
@@ -127,6 +119,7 @@ public class DBManager {
             inviteInfos.add(info);
         }
 
+        cursor.close();
         return inviteInfos;
     }
 
@@ -212,6 +205,7 @@ public class DBManager {
             }
         }
 
+        cursor.close();
         return false;
     }
 

@@ -80,7 +80,6 @@ public class ContactListFragment extends EaseContactListFragment {
 
         if(Model.getInstance().isContactSynced()){
             Log.d("ContactListFragment", "already synced");
-            Model.getInstance().loadLocalContacts();
             setupContacts();
         }
 

@@ -2,17 +2,21 @@ package com.example.youni.testapp.model;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.example.youni.testapp.model.db.PreferenceUtils;
+import com.example.youni.testapp.ui.MainActivity;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.EMContactListener;
 import com.hyphenate.chat.EMClient;
+import com.hyphenate.chat.EMMessage;
 import com.hyphenate.chat.EMOptions;
 import com.hyphenate.easeui.controller.EaseUI;
 import com.hyphenate.easeui.domain.EaseUser;
+import com.hyphenate.easeui.model.EaseNotifier;
 import com.hyphenate.exceptions.HyphenateException;
 import com.example.youni.testapp.model.db.DBManager;
 
@@ -71,6 +75,7 @@ public class Model {
         isInited = true;
 
         initListener();
+        initProvider();
 
         return isInited;
     }
@@ -158,10 +163,8 @@ public class Model {
             user.setUserName(user.getHxId() + "_" + NICKS[index%NICKS.length]);
             index++;
         }
-
         return null;
     }
-
 
     /**
      * 先加载本地的联系人
@@ -226,6 +229,42 @@ public class Model {
         return mIsContactSynced;
     }
 
+    private void initProvider(){
+        EaseUI.getInstance().getNotifier().setNotificationInfoProvider(new EaseNotifier.EaseNotificationInfoProvider() {
+            @Override
+            public String getDisplayedText(EMMessage message) {
+                String hxId = message.getFrom();
+
+                DemoUser user = mContacts.get(hxId);
+
+                if(user != null){
+                    return user.getUserName() + "发来一条消息";
+                }
+                return null;
+            }
+
+            @Override
+            public String getLatestText(EMMessage message, int fromUsersNum, int messageNum) {
+                return null;
+            }
+
+            @Override
+            public String getTitle(EMMessage message) {
+                return null;
+            }
+
+            @Override
+            public int getSmallIcon(EMMessage message) {
+                return 0;
+            }
+
+            @Override
+            public Intent getLaunchIntent(EMMessage message) {
+                return new Intent(mAppContext,MainActivity.class);
+            }
+        });
+    }
+
     private void initListener() {
         mContactListeners = new ArrayList<>();
 
@@ -235,14 +274,11 @@ public class Model {
                 Log.d(TAG,"onContactAdded : " + s);
                 if(!mContacts.containsKey(s)){
                     DemoUser user = new DemoUser();
-
                     user.setHxId(s);
-
                     mContacts.put(s, user);
 
                     // 记住应该还要去自己的APP服务器上去获取联系人信息
-
-                    fetchUserFromAppServer(user.getHxId());
+                    fetchUserFromAppServer(user);
 
                     mDBManager.saveContact(user);
 
@@ -282,9 +318,14 @@ public class Model {
 
                 updateInviteNotif(true);
 
+                DemoUser user = new DemoUser(hxId);
+
+                // 从app服务器获取昵称
+                // 我在这里就设置为个临时的
+                fetchUserFromAppServer(user);
                 InvitationInfo inviteInfo = new InvitationInfo();
-                inviteInfo.setUser(new DemoUser(hxId));
-                inviteInfo.setReason(reason);
+                inviteInfo.setUser(user);
+                inviteInfo.setReason("加个好友吧");
                 inviteInfo.setStatus(InvitationInfo.InvitationStatus.NEW_INVITE);
 
                 mDBManager.addInvitation(inviteInfo);
@@ -358,10 +399,10 @@ public class Model {
     /**
      * try to fetch the user info from app server
      * and when fecting is done, update the cache and the db
-     * @param hxId
+     * @param user
      */
-    private void fetchUserFromAppServer(String hxId) {
-
+    private void fetchUserFromAppServer(DemoUser user) {
+        user.setUserName(user.getHxId() + "_凤凰");
     }
 
     public void onLoggedIn(String userName){
