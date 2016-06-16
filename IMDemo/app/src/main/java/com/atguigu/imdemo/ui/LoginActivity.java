@@ -12,6 +12,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.atguigu.imdemo.R;
+import com.atguigu.imdemo.model.IMModel;
+import com.atguigu.imdemo.model.IMUser;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.exceptions.HyphenateException;
@@ -25,6 +27,7 @@ public class LoginActivity extends Activity {
     private EditText userNameEditText;
     private EditText pwdEditText;
     private Activity me;
+    private IMUser currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +78,14 @@ public class LoginActivity extends Activity {
             @Override
             public void run() {
                 try {
-                    EMClient.getInstance().createAccount(userName, pwd);
+                    currentUser = IMModel.getInstance().getAccount(userName);
+
+                    if(currentUser == null) {
+                        currentUser = createAppAccount(userName, pwd);
+                        IMModel.getInstance().addAccount(currentUser);
+                    }
+
+                    EMClient.getInstance().createAccount(currentUser.getHxId(), pwd);
 
                     me.runOnUiThread(new Runnable() {
                         @Override
@@ -99,18 +109,58 @@ public class LoginActivity extends Activity {
         }).start();
     }
 
-    private void login(String userName, String  pwd){
+    private IMUser createAppAccount(String username, String pwd){
+        IMUser user = new IMUser(username);
+        user.setAppUser(username);
+        return user;
+    }
+
+    private IMUser getAppAccount(String appUser){
+        return new IMUser(appUser);
+    }
+
+    private void login(final String appUser, final String  pwd){
         final ProgressDialog pd = new ProgressDialog(me);
 
         pd.show();
 
-        EMClient.getInstance().login(userName, pwd, new EMCallBack() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                IMUser user = IMModel.getInstance().getAccount(appUser);
+
+                if(user == null){
+                    user = getAppAccount(appUser);
+                    if(user == null){
+                        me.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(me,"没有次账号",Toast.LENGTH_LONG).show();
+                                pd.cancel();
+                            }
+                        });
+
+                        return;
+                    }
+
+                    loginHX(user,pwd,pd);
+                }else{
+                    loginHX(user,pwd,pd);
+                }
+            }
+        }).start();
+    }
+
+    void loginHX(final IMUser user, final String pwd, final ProgressDialog pd){
+        EMClient.getInstance().login(user.getHxId(), pwd, new EMCallBack() {
             @Override
             public void onSuccess() {
 
                 me.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        IMModel.getInstance().addAccount(user);
+
                         pd.cancel();
                         //启动主界面
                         me.startActivity(new Intent(me, MainActivity.class));

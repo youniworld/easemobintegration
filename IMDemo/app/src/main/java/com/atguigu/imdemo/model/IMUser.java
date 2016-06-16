@@ -6,12 +6,18 @@ package com.atguigu.imdemo.model;
  * 作用：
  */
 public class IMUser {
+    private String appUser;
     private String hxId;
     private String avartar;
     private String nick;
 
-    public IMUser(String hxId){
-        this.hxId = hxId;
+    public IMUser(){
+
+    }
+    public IMUser(String appUser){
+        this.appUser = appUser;
+        this.nick = appUser;
+        this.hxId = appUser;
     }
 
     public String getHxId() {
@@ -39,5 +45,13 @@ public class IMUser {
 
     public void setNick(String nick) {
         this.nick = nick;
+    }
+
+    public String getAppUser() {
+        return appUser;
+    }
+
+    public void setAppUser(String appUser) {
+        this.appUser = appUser;
     }
 }
