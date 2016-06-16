@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.widget.AdapterView;
 
 import com.atguigu.imdemo.model.IMUser;
 
@@ -47,6 +48,26 @@ public class UserAccountDB {
             account.setAvartar(cursor.getString(cursor.getColumnIndex(AccountTable.COL_AVARTAR)));
         }
 
+        cursor.close();
+
+        return null;
+    }
+
+    public IMUser getAccountByHXID(String hxId){
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("select * from " + AccountTable.TABLE_NAME + " where " + AccountTable.COL_NICK + "=?",new String[]{hxId});
+
+        while (cursor.moveToNext()){
+            IMUser account = new IMUser();
+
+            account.setAppUser(cursor.getString(cursor.getColumnIndex(AccountTable.COL_APPUSER)));
+            account.setHxId(cursor.getString(cursor.getColumnIndex(AccountTable.COL_HXID)));
+            account.setNick(cursor.getString(cursor.getColumnIndex(AccountTable.COL_NICK)));
+            account.setAvartar(cursor.getString(cursor.getColumnIndex(AccountTable.COL_AVARTAR)));
+        }
+
+        cursor.close();
         return null;
     }
 

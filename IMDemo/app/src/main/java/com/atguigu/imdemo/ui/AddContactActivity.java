@@ -106,8 +106,22 @@ public class AddContactActivity extends Activity {
             public void run() {
                 try {
                     EMClient.getInstance().contactManager().addContact(hxId,"加个好友吧");
+                    me.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(me,"邀请已经发出",Toast.LENGTH_LONG).show();
+                        }
+                    });
                 } catch (HyphenateException e) {
                     e.printStackTrace();
+                    final String error = e.toString();
+
+                    me.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(me,"邀请失败 : " + error,Toast.LENGTH_LONG).show();
+                        }
+                    });
                 }
             }
         }).start();

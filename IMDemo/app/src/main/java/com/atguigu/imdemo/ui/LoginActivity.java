@@ -159,6 +159,7 @@ public class LoginActivity extends Activity {
                 me.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        IMModel.getInstance().onLoggedIn(user.getHxId());
                         IMModel.getInstance().addAccount(user);
 
                         pd.cancel();

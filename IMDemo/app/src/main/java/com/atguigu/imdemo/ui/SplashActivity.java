@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.os.Handler;
 
 import com.atguigu.imdemo.R;
+import com.atguigu.imdemo.model.IMModel;
+import com.atguigu.imdemo.model.IMUser;
 import com.hyphenate.chat.EMClient;
 
 /**
@@ -30,7 +32,8 @@ public class SplashActivity extends Activity {
             @Override
             public void run() {
                 if(EMClient.getInstance().isLoggedInBefore()){
-                    startActivity(new Intent(SplashActivity.this,MainActivity.class));
+                    IMModel.getInstance().onLoggedIn(EMClient.getInstance().getCurrentUser());
+                    startActivity(new Intent(SplashActivity.this, MainActivity.class));
                 }else{
                     startActivity(new Intent(SplashActivity.this,LoginActivity.class));
                 }

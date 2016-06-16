@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 import com.atguigu.imdemo.R;
 import com.atguigu.imdemo.ui.AddContactActivity;
+import com.atguigu.imdemo.ui.InvitationListActivity;
 import com.hyphenate.easeui.ui.EaseContactListFragment;
 import com.hyphenate.easeui.widget.EaseTitleBar;
 
@@ -27,6 +28,17 @@ public class ContactListFragment extends EaseContactListFragment {
             @Override
             public void onClick(View v) {
                 getActivity().startActivity(new Intent(getActivity(), AddContactActivity.class));
+            }
+        });
+
+        View headerView = View.inflate(getActivity(),R.layout.fragment_contact_list_notification_header,null);
+
+        listView.addHeaderView(headerView);
+
+        headerView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().startActivity(new Intent(getActivity(),InvitationListActivity.class));
             }
         });
     }

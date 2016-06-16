@@ -49,6 +49,7 @@
             android:launchMode="singleTask"/>
 
         <activity android:name=".ui.AddContactActivity"/>
+        <activity android:name=".ui.InvitationListActivity"/>
 
         <!-- 设置环信应用的appkey -->
         <meta-data
